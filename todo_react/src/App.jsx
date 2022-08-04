@@ -2,14 +2,16 @@
 import React from "react";
 import { useState } from "react";
 import './App.css';
+import { InputTodo } from './components/InputTodo';
+import { IncompleteTodos } from './components/IncompleteTodos';
+import { CompleteTodos } from './components/CompleteTodos';
 
 export const App = () => {
   const [todoText, setTodoText] = useState('');
-  const [incomplete, setIncomplete] = useState(['あああ', 'いいい']);
-  const [complete, setComplete] = useState(['ううう']);
+  const [incomplete, setIncomplete] = useState([]);
+  const [complete, setComplete] = useState([]);
 
   const onChangeTodo = (event) => setTodoText(event.target.value);
-
 
   //追加ボタン
   const onClickAdd = () => {
@@ -33,48 +35,33 @@ export const App = () => {
     newIncomplete.splice(index, 1);
 
     const newComplete = [...complete, incomplete[index]];
-    console.log(newComplete);
 
     setIncomplete(newIncomplete);
     setComplete(newComplete);
  
   };
+
+  //戻すボタン
+  const onClickBack = (index) => {
+    const newComplete = [...complete];
+    newComplete.splice(index, 1);
+
+    const newIncomplete = [...incomplete, complete[index]];
+
+    setComplete(newComplete);
+    setIncomplete(newIncomplete);
+  };
   
   return (
     <>
-    <div className="input-area">
-      <input placeholder="TODOを入力" value={todoText} onChange={ onChangeTodo }/>
-      <button onClick={onClickAdd}>追加</button>
-    </div>
+    { incomplete.length >= 10 && <p style={{color: 'red'}} >登録できるTODOは5個まで。消化しろ!!</p> }
 
-    <div className="incomplete-area">
-      <p className="ttl">未完了のTODO</p>
-      <ul>
-        {incomplete.map((todo, index) => {
-          return (
-            <div key={ todo } className="list-low">
-            <li>{ todo }</li>
-            <button onClick={() => onClickComplete(index)}>完了</button>
-            <button onClick={() => onClickDelete(index)}>削除</button>
-          </div>
-          );
-        })}
-      </ul>
-    </div>
+    <InputTodo todoText={todoText} onChangeTodo={onChangeTodo} onClickAdd={onClickAdd} disabled={incomplete.length >= 10} />
 
-    <div className="complete-area">
-      <p className="ttl">完了のTODO</p>
-      <ul>
-        {complete.map((todo) => {
-          return (
-            <div key={ todo } className="list-low">
-              <li>ううう</li>
-              <button>戻す</button>
-            </div>
-          );
-        })}
-      </ul>
-    </div>
+    <IncompleteTodos incomplete={incomplete} onClickDelete={onClickDelete} onClickComplete={onClickComplete} />
+
+    <CompleteTodos complete={complete} onClickBack={onClickBack} />
+
     </>
   
   
